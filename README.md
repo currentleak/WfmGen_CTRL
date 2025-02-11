@@ -12,3 +12,9 @@ can you add to the script:
 1- detection of the OS
 2- Scan Serial bus available
 3- Serial port selection is a drop down list of the port available
+
+2nd gpt mods
+add a disconnect button, connect button should be disabled when connection is active
+correction: refresh button should also be disabled when connected
+correction: send should be disabled if not connected
+
