@@ -12,10 +12,12 @@ class WaveformGeneratorController:
 
         # Detect the OS and display it
         self.os_name = platform.system()
-        tk.Label(master, text=f"Operating System: {self.os_name}").grid(row=0, column=0, padx=5, pady=5, sticky="w", columnspan=2)
+        tk.Label(master, text=f"Operating System: {self.os_name}")\
+            .grid(row=0, column=0, padx=5, pady=5, sticky="w", columnspan=2)
 
         # Serial port selection section using a drop-down list (Combobox)
-        tk.Label(master, text="Serial Port:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        tk.Label(master, text="Serial Port:")\
+            .grid(row=1, column=0, padx=5, pady=5, sticky="e")
         self.port_combo = ttk.Combobox(master, values=[], state="readonly", width=15)
         self.port_combo.grid(row=1, column=1, padx=5, pady=5)
 
@@ -23,7 +25,8 @@ class WaveformGeneratorController:
         self.refresh_button.grid(row=1, column=2, padx=5, pady=5)
 
         # Baud rate selection remains as an entry field
-        tk.Label(master, text="Baud Rate:").grid(row=1, column=3, padx=5, pady=5, sticky="e")
+        tk.Label(master, text="Baud Rate:")\
+            .grid(row=1, column=3, padx=5, pady=5, sticky="e")
         self.baud_entry = tk.Entry(master, width=10)
         self.baud_entry.grid(row=1, column=4, padx=5, pady=5)
         self.baud_entry.insert(0, "9600")  # Default baud rate
@@ -32,12 +35,18 @@ class WaveformGeneratorController:
         self.connect_button = tk.Button(master, text="Connect", command=self.connect)
         self.connect_button.grid(row=1, column=5, padx=5, pady=5)
 
+        # Disconnect button (initially disabled)
+        self.disconnect_button = tk.Button(master, text="Disconnect", command=self.disconnect, state=tk.DISABLED)
+        self.disconnect_button.grid(row=1, column=6, padx=5, pady=5)
+
         # Waveform parameters
-        tk.Label(master, text="Frequency (Hz):").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        tk.Label(master, text="Frequency (Hz):")\
+            .grid(row=2, column=0, padx=5, pady=5, sticky="e")
         self.freq_entry = tk.Entry(master)
         self.freq_entry.grid(row=2, column=1, padx=5, pady=5)
 
-        tk.Label(master, text="Amplitude (V):").grid(row=2, column=2, padx=5, pady=5, sticky="e")
+        tk.Label(master, text="Amplitude (V):")\
+            .grid(row=2, column=2, padx=5, pady=5, sticky="e")
         self.amp_entry = tk.Entry(master)
         self.amp_entry.grid(row=2, column=3, padx=5, pady=5)
 
@@ -46,17 +55,18 @@ class WaveformGeneratorController:
         self.burst_check = tk.Checkbutton(master, text="Burst Mode", variable=self.burst_var)
         self.burst_check.grid(row=3, column=0, padx=5, pady=5)
 
-        tk.Label(master, text="Burst Parameter:").grid(row=3, column=1, padx=5, pady=5, sticky="e")
+        tk.Label(master, text="Burst Parameter:")\
+            .grid(row=3, column=1, padx=5, pady=5, sticky="e")
         self.burst_param_entry = tk.Entry(master)
         self.burst_param_entry.grid(row=3, column=2, padx=5, pady=5)
 
-        # Button to send commands to the device
-        self.send_button = tk.Button(master, text="Send", command=self.send_commands)
+        # Button to send commands to the device (disabled when not connected)
+        self.send_button = tk.Button(master, text="Send", command=self.send_commands, state=tk.DISABLED)
         self.send_button.grid(row=4, column=0, columnspan=2, padx=5, pady=10)
 
         # Status label to show connection and command status
         self.status_label = tk.Label(master, text="Not Connected", fg="red")
-        self.status_label.grid(row=5, column=0, columnspan=6, padx=5, pady=5)
+        self.status_label.grid(row=5, column=0, columnspan=7, padx=5, pady=5)
 
         self.serial_conn = None  # Serial connection object
 
@@ -91,9 +101,28 @@ class WaveformGeneratorController:
         try:
             self.serial_conn = serial.Serial(port, baud, timeout=1)
             self.status_label.config(text=f"Connected to {port}", fg="green")
+            # Disable the connect and refresh buttons; enable disconnect and send buttons
+            self.connect_button.config(state=tk.DISABLED)
+            self.disconnect_button.config(state=tk.NORMAL)
+            self.refresh_button.config(state=tk.DISABLED)
+            self.send_button.config(state=tk.NORMAL)
         except Exception as e:
             messagebox.showerror("Connection Error", str(e))
             self.status_label.config(text="Connection Failed", fg="red")
+
+    def disconnect(self):
+        """Disconnect the serial connection."""
+        if self.serial_conn is not None and self.serial_conn.is_open:
+            self.serial_conn.close()
+            self.serial_conn = None
+            self.status_label.config(text="Disconnected", fg="orange")
+            # Re-enable the connect and refresh buttons; disable disconnect and send buttons
+            self.connect_button.config(state=tk.NORMAL)
+            self.disconnect_button.config(state=tk.DISABLED)
+            self.refresh_button.config(state=tk.NORMAL)
+            self.send_button.config(state=tk.DISABLED)
+        else:
+            messagebox.showinfo("Info", "No active connection to disconnect.")
 
     def send_commands(self):
         """Compose and send commands based on user input."""
