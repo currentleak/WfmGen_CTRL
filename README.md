@@ -18,3 +18,13 @@ add a disconnect button, connect button should be disabled when connection is ac
 correction: refresh button should also be disabled when connected
 correction: send should be disabled if not connected
 
+3rd gpt mods
+enleve le champ Burst parameter
+ajoute le champ et la fonction pour sélectionner le nombre de cycle
+correction: le nombre de cycle doit etre disable si le mode burst n'est pas coché,
+correction: le champ fréquence doit etre en kHz
+correction: ajouter des valeurs par défaut dans les champs : 5MHz, 1V, nbr cycle 10
+correction: ajouter le controle du délais du burst, par défaut 1us
+correction: ajouter la sélection du type de signal, par défaut sinus
+correction: ajouter la sélection du trig ext ou int
+correction: le trigger par défaut doit être 'externe', le champ doit être sous le champs "Mode Burst' et doit être disable si le mode burst est non coché
